@@ -1,0 +1,123 @@
+-- Zad. 11
+SELECT data_zam, nazwa
+FROM (
+    SELECT DATE(z.data) AS data_zam, p.nazwa, SUM(p.cena * d.sztuk) AS suma
+    FROM zamow z
+    JOIN detal_zamow d ON z.idz = d.z_id
+    JOIN produkty p ON d.p_id = p.idp
+    GROUP BY data_zam, p.idp
+) AS pod
+WHERE (data_zam, suma) IN (
+    SELECT data_zam, MAX(suma)
+    FROM (
+        SELECT DATE(z.data) AS data_zam, SUM(p.cena * d.sztuk) AS suma
+        FROM zamow z
+        JOIN detal_zamow d ON z.idz = d.z_id
+        JOIN produkty p ON d.p_id = p.idp
+        GROUP BY data_zam, p.idp
+    ) AS suma_pod
+    GROUP BY data_zam
+)
+ORDER BY data_zam;
+
+
+-- Zad. 12
+SELECT k.miasto, k.nazwa, z.data
+FROM klienci k
+JOIN zamow z ON k.idk = z.k_id
+WHERE (k.miasto, z.data) IN (
+    SELECT k2.miasto, MAX(z2.data)
+    FROM klienci k2
+    JOIN zamow z2 ON k2.idk = z2.k_id
+    GROUP BY k2.miasto
+)
+ORDER BY k.miasto;
+
+
+-- Zad. 13
+SELECT DISTINCT k.*
+FROM klienci k
+JOIN zamow z ON k.idk = z.k_id
+JOIN detal_zamow d ON z.idz = d.z_id
+JOIN produkty p ON d.p_id = p.idp
+WHERE p.nazwa LIKE '%Iphone%';
+
+
+-- Zad. 14
+SELECT nazwa 
+FROM produkty 
+WHERE idp NOT IN (SELECT DISTINCT p_id FROM detal_zamow);
+
+
+
+-- Zad. 15
+SELECT nazwa 
+FROM klienci 
+WHERE idk NOT IN (SELECT DISTINCT k_id FROM zamow WHERE idz IN (SELECT DISTINCT z_id FROM detal_zamow));
+
+
+
+-- Zad. 16
+SELECT idz 
+FROM zamow 
+WHERE idz NOT IN (SELECT DISTINCT z_id FROM detal_zamow);
+
+
+-- Zad. 17
+SELECT * 
+FROM zamow z1
+WHERE 3 > (SELECT COUNT(*) 
+           FROM zamow z2 
+           WHERE z2.data > z1.data)
+ORDER BY z1.data DESC;
+
+
+-- Zad. 18
+SELECT * 
+FROM produkty 
+WHERE idp = (SELECT p_id 
+             FROM detal_zamow 
+             GROUP BY p_id 
+             ORDER BY SUM(sztuk) DESC 
+             LIMIT 1);
+
+SELECT * 
+FROM detal_zamow 
+WHERE p_id = (SELECT p_id 
+              FROM detal_zamow 
+              GROUP BY p_id 
+              ORDER BY SUM(sztuk) DESC 
+              LIMIT 1);
+
+
+SELECT COUNT(DISTINCT z_id) 
+FROM detal_zamow 
+WHERE p_id = (SELECT p_id 
+              FROM detal_zamow 
+              GROUP BY p_id 
+              ORDER BY SUM(sztuk) DESC 
+              LIMIT 1);
+
+
+
+-- Zad. 19
+SELECT k.nazwa, 
+       COUNT(DISTINCT dz.p_id) AS liczba_produktow
+FROM klienci k
+LEFT JOIN zamow z ON k.idk = z.k_id
+LEFT JOIN detal_zamow dz ON z.idz = dz.z_id
+LEFT JOIN produkty p ON dz.p_id = p.idp
+WHERE p.cena > 1500
+GROUP BY k.idk;
+
+
+-- Zad. 20
+SELECT p.nazwa, 
+       COUNT(DISTINCT k.idk) AS liczba_klientow
+FROM produkty p
+JOIN detal_zamow dz ON p.idp = dz.p_id
+JOIN zamow z ON dz.z_id = z.idz
+JOIN klienci k ON z.k_id = k.idk
+WHERE k.miasto LIKE 'W%'
+GROUP BY p.idp;
+
