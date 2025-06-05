@@ -1,0 +1,10 @@
+Zad 1
+SET @data_urodzin = "1995-08-04";
+SELECT dayofweek(@data_urodzin);
+SELECT dayofyears(@data_urodzin);
+
+Zad 2:
+SET @borrowdate = "2018-01-27";
+SET @return = "2018-02-15;
+SET @end_of_time = date_add(@borrowdate, INTERVAL 1 MONTH);
+SELECT IF ((dayofweek(@end_of_time) != 1) or (dayofweek(@end_of_time != 7)), @end_of_time, if((dayofweek(@end_of_time)==1, date_sub(end_of_time, INTERVAL 2 DAY), IF(dayofweek(@end_of_time)==7,date_sub(#end_of_time, INTERVAL 1 DAY), "www");
