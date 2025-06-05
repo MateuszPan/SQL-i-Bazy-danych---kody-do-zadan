@@ -1,0 +1,44 @@
+Zad 1
+
+SELECT tytul, autor FROM dzielo WHERE kategoria NOT LIKE "%fizyka%";
+
+Zad 2
+
+SELECT * FROM rezerwacja WHERE DAY(datazamow)%2 = 0;
+
+Zad 3
+
+SELECT DISTINCT wydawnictwo FROM egzemplarz JOIN rezerwacja ON rezerwacja.e_id = egzemplarz.ide WHERE WEEKDAY(rezerwacja.datazwrot) = 4 AND rezerwacja.datazwrot IS NOT NULL;
+
+Zad 4
+
+SELECT * FROM czytelnik JOIN rezerwacja ON rezerwacja.c_id = czytelnik.idc WHERE DATEDIFF(datazwrot, datawypoz) > 30;
+
+// Założyłem że bierzemy za liczbę dni miesiąca 30 dni. Jeśli wolimy 31 to mamy. Po przetestowaniu, w tej konkretnej bazie nie ma to jednak wpływu na wynik
+
+SELECT * FROM czytelnik JOIN rezerwacja ON rezerwacja.c_id = czytelnik.idc WHERE DATEDIFF(datazwrot, datawypoz) > 31;
+
+Zad 5
+
+SELECT tytul, kategoria FROM dzielo LEFT JOIN egzemplarz ON egzemplarz.d_id = dzielo.idd WHERE egzemplarz.d_id IS NULL ORDER BY(egzemplarz.rokwydania) DESC;
+
+Zad 6
+
+SELECT COUNT(*) FROM rezerwacja JOIN czytelnik ON czytelnik.idc = rezerwacja.c_id JOIN egzemplarz ON egzemplarz.ide = rezerwacja.e_id WHERE czytelnik.adres LIKE "%Milicz%" AND LENGTH(egzemplarz.wydawnictwo) > 6;
+
+
+Zad 7
+
+SELECT COUNT(*) FROM egzemplarz JOIN dzielo ON dzielo.idd = egzemplarz.d_id WHERE dzielo.kategoria LIKE "%powieść%" AND egzemplarz.rokwydania < 2005;
+
+Zad 8
+
+SELECT dzielo.*, AVG(rokwydania) FROM dzielo JOIN egzemplarz ON egzemplarz.d_id = dzielo.idd WHERE LENGTH(egzemplarz.wydawnictwo) < 5 GROUP BY 1;
+
+Zad 9
+
+SELECT czytelnik.nazwisko, czytelnik.telefon, MAX(rezerwacja.datawypoz) AS pierwsze_wypozyczenia FROM czytelnik LEFT JOIN rezerwacja ON czytelnik.idc = rezerwacja.c_id GROUP BY czytelnik.idc;
+
+Zad 10
+
+SELECT d.* FROM dzielo d JOIN egzemplarz e ON d.idd = e.d_id JOIN rezerwacja r ON e.ide = r.e_id GROUP BY d.idd HAVING COUNT(DISTINCT r.e_id) = (SELECT MAX(COUNT(e_id)) FROM (SELECT COUNT(DISTINCT r2.e_id) FROM dzielo d2 JOIN egzemplarz e2 ON d2.idd = e2.d_id JOIN rezerwacja r2 ON r2.e_id = e2.ide GROUP BY d2.idd) AS sub );
